@@ -27,6 +27,7 @@ Tracket racket;
 TBall ball;
 int Counter = 0;
 int MaxResult = 0;
+int Level = 1;
 
 void InitRacket() {
 	racket.w = 7;
@@ -58,7 +59,7 @@ void PutBall()
 	mas[ball.iy][ball.ix] = '@';
 }
 
-void InitField()
+void InitField(int Level)
 {
 	for (int i = 0; i < width; i++)
 		mas[0][i] = '#';
@@ -70,6 +71,23 @@ void InitField()
 
 	for (int i = 2; i < height; i++)
 		strncpy(mas[i], mas[1], width + 1);
+
+	if (Level == 2)
+	for (int i = 20; i < 50; i++)
+		mas[10][i] = '#';
+
+	if (Level == 3) {
+		for (int i = 10; i < 30; i++)
+			mas[8][i] = '#';
+		for (int j = 35; j < 55; j++)
+			mas[12][j] = '#';
+	}
+	
+	if (Level == 4) {
+		for (int j = 1; j < 10; j++)
+			for (int i = 1; i < 65; i += 7)
+				mas[j][i] = '#';
+	}
 }
 
 void Show()
@@ -78,12 +96,14 @@ void Show()
 	{
 		printf("%s", mas[i]);
 		if (i == 4)
+			printf("     Level: %d", Level);
+		if (i == 7)
 			printf("     Counter: %d", Counter);
-		if (i == 6)
-			printf("     Max Result: %d", MaxResult);
 		if (i == 9)
+			printf("     Max Result: %d", MaxResult);
+		if (i == 12)
 			printf("     Press SPACE to start");
-		if (i == 11)
+		if (i == 14)
 			printf("     Use A and D to move the racket");
 		if (i < height - 1)
 			printf("\n");
@@ -143,12 +163,22 @@ void SetCur(int x, int y)
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
+void ShowLevel()
+	{
+		system("cls");
+		printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n \t\t\t\t\t\t       Level %d", Level);
+		Sleep(1500);
+		system("cls");
+	}
+
 int main()
 {
 	char press;
 	BOOL run = FALSE;
 	InitRacket();
 	InitBall();
+
+	ShowLevel();
 
 	do
 	{
@@ -163,7 +193,16 @@ int main()
 			Counter = 0;
 		}
 
-		InitField();
+		if (Counter > 4)
+		{
+			Level++;
+			run = FALSE;
+			MaxResult += Counter;
+			Counter = 0;
+			ShowLevel();
+		}
+
+		InitField(Level);
 		PutRacket();
 		PutBall();
 		Show();
