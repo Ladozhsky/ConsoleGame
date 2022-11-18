@@ -26,8 +26,8 @@ char mas[height][width + 1];
 Tracket racket;
 TBall ball;
 int Counter = 0;
-int MaxResult = 0;
 int Level = 1;
+BOOL run = FALSE;
 
 void InitRacket() {
 	racket.w = 7;
@@ -44,7 +44,6 @@ void MoveBall(float x, float y)
 }
 
 void InitBall() {
-	MoveBall(2, 2);
 	ball.corner = -1;
 	ball.speed = 0.5;
 }
@@ -88,6 +87,12 @@ void InitField(int Level)
 			for (int i = 1; i < 65; i += 7)
 				mas[j][i] = '#';
 	}
+
+	if (Level == 5)
+		for (int j = 1; j < 13; j++) {
+			for (int i = 1; i < width - 1; i++)
+				mas[j][i] = '#';
+		}
 }
 
 void Show()
@@ -95,12 +100,10 @@ void Show()
 	for (int i = 0; i < height; i++)
 	{
 		printf("%s", mas[i]);
-		if (i == 4)
+		if (i == 5)
 			printf("     Level: %d", Level);
 		if (i == 7)
 			printf("     Counter: %d", Counter);
-		if (i == 9)
-			printf("     Max Result: %d", MaxResult);
 		if (i == 12)
 			printf("     Press SPACE to start");
 		if (i == 14)
@@ -131,7 +134,11 @@ void AutoMoveBall()
 
 	if ((mas[ball.iy][ball.ix] == '#') || (mas[ball.iy][ball.ix] == '='))
 	{
-		if (mas[ball.iy][ball.ix] == '=') Counter++;
+		if (mas[ball.iy][ball.ix] == '=')
+		{
+			Counter++;
+			Beep(1000, 1000 / 8);
+		}
 
 		if ((ball.ix != b1.ix) && (ball.iy != b1.iy))
 		{
@@ -151,7 +158,6 @@ void AutoMoveBall()
 			b1.corner = (2 * M_PI - b1.corner);
 
 		ball = b1;
-		AutoMoveBall;
 	}
 }
 
@@ -164,17 +170,76 @@ void SetCur(int x, int y)
 }
 
 void ShowLevel()
+{
+	system("cls");
+	printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n \t\t\t\t\t\t       Level %d", Level);
+	Sleep(1500);
+	system("cls");
+}
+
+void ShowEnd()
+{
+	system("cls");
+	printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n \t\t\t\t\t\t       You Win!");
+	Sleep(100000);
+	system("cls");
+}
+
+void setColor(int ForgC)
+{
+	WORD wColor;
+
+	HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+
+
+	if (GetConsoleScreenBufferInfo(hStdOut, &csbi))
 	{
-		system("cls");
-		printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n \t\t\t\t\t\t       Level %d", Level);
-		Sleep(1500);
-		system("cls");
+		wColor = (csbi.wAttributes & 0xF0) + (ForgC & 0x0F);
+		SetConsoleTextAttribute(hStdOut, wColor);
 	}
+}
+
+void ManageRacket()
+{
+	if (GetKeyState('A') < 0) MoveRacket(--racket.x);
+	if (GetKeyState('D') < 0) MoveRacket(++racket.x);
+	if (GetKeyState(' ') < 0) run = TRUE;
+
+	if (!run)
+		MoveBall(racket.x + racket.w / 2, racket.y - 1);
+	Sleep(10);
+}
+
+void Fail()
+{
+	if (ball.iy >= height - 1)
+	{
+		run = FALSE;
+		Counter = 0;
+	}
+}
+
+Win()
+{
+	if (Counter > 4)
+	{
+		if (Level < 5) {
+			Level++;
+			ball.speed += 0.05;
+			run = FALSE;
+			Counter = 0;
+			ShowLevel();
+		}
+		else {
+			ShowEnd();
+		}
+	}
+}
 
 int main()
 {
-	char press;
-	BOOL run = FALSE;
+	setColor(6);
 	InitRacket();
 	InitBall();
 
@@ -186,35 +251,17 @@ int main()
 
 		if (run)
 			AutoMoveBall();
-		if (ball.iy > height)
-		{
-			run = FALSE;
-			if (Counter > MaxResult) MaxResult = Counter;
-			Counter = 0;
-		}
-
-		if (Counter > 4)
-		{
-			Level++;
-			run = FALSE;
-			MaxResult += Counter;
-			Counter = 0;
-			ShowLevel();
-		}
+		Fail();
+		Win();
 
 		InitField(Level);
 		PutRacket();
 		PutBall();
 		Show();
-		
-
-		if (GetKeyState('A') < 0) MoveRacket(--racket.x);
-		if (GetKeyState('D') < 0) MoveRacket(++racket.x);
-		if (GetKeyState(' ') < 0) run = TRUE;
-		if (!run)
-			MoveBall(racket.x + racket.w / 2, racket.y - 1);
-		Sleep(10);
+		ManageRacket();
 
 	} while (GetKeyState(VK_ESCAPE) >= 0);
+	
 	return 0;
 }
+
