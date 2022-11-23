@@ -1,5 +1,3 @@
-#pragma once
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -65,3 +63,5 @@ void ManageRacket();
 void Fail();
 
 void Win();
+
+void GameLoop();

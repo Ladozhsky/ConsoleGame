@@ -1,14 +1,3 @@
-#pragma once
-#include "Dependencies.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <conio.h>
-#include <windows.h>
-#define _USE_MATH_DEFINES
-#include <math.h>
-#pragma warning(disable : 4996)
-
 void InitRacket() {
 	racket.w = 7;
 	racket.x = (width - racket.w) / 2;
@@ -220,4 +209,23 @@ void Win()
 			ShowEnd();
 		}
 	}
+}
+
+void GameLoop() {
+	do
+	{
+		SetCur(0, 0);
+
+		if (run)
+			AutoMoveBall();
+		Fail();
+		Win();
+
+		InitField();
+		PutRacket();
+		PutBall();
+		Show();
+		ManageRacket();
+
+	} while (GetKeyState(VK_ESCAPE) >= 0);
 }
