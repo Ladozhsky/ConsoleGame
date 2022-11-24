@@ -1,4 +1,4 @@
-﻿#include "Dependencies.h"
+﻿#include "../Header files/Dependencies.h"
 #include "Dependencies.c"
 
 int main()

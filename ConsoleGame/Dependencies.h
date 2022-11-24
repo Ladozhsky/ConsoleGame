@@ -32,36 +32,3 @@ TBall ball;
 int Counter = 0;
 int Level = 1;
 BOOL run = FALSE;
-
-
-void InitRacket();
-
-void MoveBall(float x, float y);
-
-void InitBall();
-
-void PutRacket();
-
-void PutBall();
-
-void InitField();
-
-void Show();
-
-void MoveRacket(int x);
-
-void AutoMoveBall();
-
-void SetCur(int x, int y);
-
-void ShowLevel();
-
-void ShowEnd();
-
-void setColor(int ForgC);
-
-void ManageRacket();
-
-void Fail();
-
-void Win();
